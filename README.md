@@ -2,6 +2,8 @@
 
 Cloud FirestoreをReactで試すためのアプリ
 
+![](screen.gif)
+
 # Get started
 
 ```
