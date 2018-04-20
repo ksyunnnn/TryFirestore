@@ -8,10 +8,11 @@ import styled from 'styled-components';
 const Heights = {
   header: '40',
   contens: '100vh',
+  form: '480',
 }
 
 const Colors = {
-  white: '#fafafa',
+  white: '#fff',
   gray: '#eee',
 }
 
@@ -38,41 +39,82 @@ const Card = styled.div`
   box-shadow: rgba(0, 0, 0, 0.25) 0px 4px 4px;
 `;
 
-const InputForm = (props) => {
-  const input = props.input? props.input: { firstName: "", lastName: "", born: "" };
-  const Root = Card.extend`
-      height: 480px;
-  `;
-  const Button = styled.button`
-      box-shadow: 0 2px 5px 0 rgba(0,0,0,0.26);
-      display: block;
-      cursor: pointer;
-      min-height: 36px;
-      min-width: 88px;
-      line-height: 36px;
-      border-radius: 2px;
-      box-sizing: border-box;
-      padding: 0 6px;
-      margin: 40px auto;
-      text-transform: uppercase;
-      background: transparent;
-      color: currentColor;
-      :hover {
-        color: #999;
-      }
-}
-  `;
-  return (
-    <Root>
-      <Input name="first-name" placeholder="Type your first name." value={input.firstName} />
-      <br /><br />
-      <Input name="last-name" placeholder="Type your last name." value={input.lastName} />
-      <br /><br />
-      <Input name="born" placeholder="Type your born." value={input.born} />
+const Anchor = styled.a`
+  color: inherit;
+  text-decoration: none;
+`;
 
-      <Button>Submit</Button>
-    </Root>
-  );
+const Form = Card.extend`
+    height: ${Heights.form}px;
+`;
+const Button = styled.button`
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.26);
+    display: block;
+    cursor: pointer;
+    min-height: 36px;
+    min-width: 88px;
+    line-height: 36px;
+    border-radius: 2px;
+    box-sizing: border-box;
+    padding: 0 6px;
+    margin: 40px auto;
+    text-transform: uppercase;
+    background: transparent;
+    color: currentColor;
+    :hover {
+      color: #999;
+    }
+}
+`;
+
+class InputForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      first: "",
+      last: "",
+      born: "",
+    };
+    this.onKeyChange = this.onKeyChange.bind(this);
+  }
+
+  onKeyChange(e) {
+    switch (e.target.name) {
+      case "first":
+        this.setState({
+          first: e.target.value,
+        });
+        break
+      case "last":
+        this.setState({
+          last: e.target.value,
+        });
+        break
+      case "born":
+        this.setState({
+          born: e.target.value,
+        });
+        break
+    }
+  }
+
+  render(){
+    return (
+      <Form>
+        <Input name="first" placeholder="Type your first name." onChange={this.onKeyChange} value={this.state.first} />
+        <br /><br />
+        <Input name="last" placeholder="Type your last name." onChange={this.onKeyChange} value={this.state.last} />
+        <br /><br />
+        <Input name="born" placeholder="Type your born." onChange={this.onKeyChange} value={this.state.born} />
+
+        <Button
+          onClick={()=>{this.props.pushUserAction(this.state.first,this.state.last,this.state.born)}}
+          >
+          Submit
+        </Button>
+      </Form>
+    );
+  }
 }
 
 const DataCard = (props) => {
@@ -80,7 +122,7 @@ const DataCard = (props) => {
   const Root = Card.extend`
       height: 80px;
       color: #555;
-      margin-bottom: 20px;
+      margin: 0 10px 20px 10px;
       line-height: 30px;
   `;
   const Name = styled.div`
@@ -96,29 +138,14 @@ const DataCard = (props) => {
 }
 
 const DisplayDataCards = (props) => {
+  const { users } = props;
   const Root = styled.div`
-      width: 760px;
+      width: 780px;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       flex-wrap: wrap;
       align-content: flex-start;
   `;
-  const users = !props.users
-  ? props.users
-  : [
-      {
-        first: "Ada",
-        last: "Lovelace",
-        born: 1815
-      },
-      {
-        first: "Ada",
-        last: "Lovelace",
-        born: 1815
-      },
-    ];
-
-// {TODO} mapが実行されない
 
   return (
     <Root>
@@ -134,6 +161,8 @@ const DisplayDataCards = (props) => {
   );
 }
 
+
+
 export const Header = (props) => {
   const Root = DefaultContainer.extend`
       height: ${Heights.header}px;
@@ -144,9 +173,13 @@ export const Header = (props) => {
       box-sizing: border-box;
   `;
   return (
-    <Root>Use Firestore</Root>
+    <Root>
+      <Anchor target="_blank" href="#"><i className="fas fa-code"></i> </Anchor>
+      Try Firestore
+    </Root>
   );
 }
+
 
 export const Contents = (props) => {
   const Root = DefaultContainer.extend`
@@ -162,9 +195,12 @@ export const Contents = (props) => {
   `;
   return (
     <Root>
-      This is Contents
+      This is User List addable.
+
       <ContentsWrapper>
-        <InputForm />
+        <InputForm
+          pushUserAction={props.pushUserAction}
+          />
         <DisplayDataCards
           users={props.users}
           input={props.input}
